@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	Token string
+	Token   string
+	BaseURL string
 )
 
 var RootCmd = &cobra.Command{
@@ -20,5 +21,6 @@ var RootCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.PersistentFlags().StringVarP(&Token, "token", "", "", "Private token")
+	RootCmd.PersistentFlags().StringVarP(&Token, "token", "t", "", "Private token")
+	RootCmd.PersistentFlags().StringVarP(&BaseURL, "baseURL", "b", "https://gitlab.com/api/v3", "Base URL")
 }

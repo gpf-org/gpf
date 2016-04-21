@@ -25,7 +25,7 @@ var listBranchesCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List branches",
 	Run: func(cmd *cobra.Command, args []string) {
-		result, err := gpf.ListBranches(Token)
+		result, err := gpf.ListBranches(BaseURL, Token)
 		if err != nil {
 			fmt.Printf("%s\n", err)
 			os.Exit(1)

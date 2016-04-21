@@ -6,8 +6,9 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func ListBranches(token string) ([]*gitlab.Branch, error) {
+func ListBranches(baseURL string, token string) ([]*gitlab.Branch, error) {
 	git := gitlab.NewClient(nil, token)
+	git.SetBaseURL(baseURL)
 
 	pid := 1
 	branches, _, err := git.Branches.ListBranches(pid)
