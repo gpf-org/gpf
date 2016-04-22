@@ -1,10 +1,6 @@
 package gpf
 
-import (
-	"log"
-
-	"github.com/xanzy/go-gitlab"
-)
+import "github.com/xanzy/go-gitlab"
 
 func ListBranches(baseURL string, token string) ([]*gitlab.Branch, error) {
 	git := gitlab.NewClient(nil, token)
@@ -12,9 +8,6 @@ func ListBranches(baseURL string, token string) ([]*gitlab.Branch, error) {
 
 	pid := 1
 	branches, _, err := git.Branches.ListBranches(pid)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	return branches, err
 }

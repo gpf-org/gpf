@@ -1,10 +1,6 @@
 package gpf
 
-import (
-	"log"
-
-	"github.com/xanzy/go-gitlab"
-)
+import "github.com/xanzy/go-gitlab"
 
 // CreateOrUpdateProjectHook creates a hook to a specified project or update it if already exists.
 func CreateOrUpdateProjectHook(baseURL string, token string, projectID int) (*gitlab.ProjectHook, error) {
@@ -17,9 +13,6 @@ func CreateOrUpdateProjectHook(baseURL string, token string, projectID int) (*gi
 	// TODO: handle paging search
 	optsList := &gitlab.ListProjectHooksOptions{}
 	hooks, _, err := git.Projects.ListProjectHooks(projectID, optsList)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	for i := range hooks {
 		if hooks[i].URL == hookURL {
@@ -33,9 +26,6 @@ func CreateOrUpdateProjectHook(baseURL string, token string, projectID int) (*gi
 			}
 
 			hook, _, err := git.Projects.EditProjectHook(projectID, hooks[i].ID, optsEdit)
-			if err != nil {
-				log.Fatal(err)
-			}
 
 			return hook, err
 		}
@@ -50,9 +40,6 @@ func CreateOrUpdateProjectHook(baseURL string, token string, projectID int) (*gi
 	}
 
 	hook, _, err := git.Projects.AddProjectHook(projectID, optsAdd)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	return hook, err
 }
