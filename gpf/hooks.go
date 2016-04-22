@@ -6,6 +6,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
+// CreateProjectHook creates a hook to a specified project.
 func CreateProjectHook(baseURL string, token string, projectID int) (*gitlab.ProjectHook, error) {
 	git := gitlab.NewClient(nil, token)
 	git.SetBaseURL(baseURL)
