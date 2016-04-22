@@ -6,8 +6,8 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-// CreateProjectHook creates a hook to a specified project.
-func CreateProjectHook(baseURL string, token string, projectID int) (*gitlab.ProjectHook, error) {
+// CreateOrUpdateProjectHook creates a hook to a specified project or update it if already exists.
+func CreateOrUpdateProjectHook(baseURL string, token string, projectID int) (*gitlab.ProjectHook, error) {
 	git := gitlab.NewClient(nil, token)
 	git.SetBaseURL(baseURL)
 
@@ -20,8 +20,22 @@ func CreateProjectHook(baseURL string, token string, projectID int) (*gitlab.Pro
 		log.Fatal(err)
 	}
 
-	for _, hook := range hooks {
-		if hook.URL == hookURL {
+	for i := range hooks {
+		if hooks[i].URL == hookURL {
+			// ensure it has the right configurations
+			optsEdit := &gitlab.EditProjectHookOptions{
+				URL:                 hookURL,
+				PushEvents:          true,
+				IssuesEvents:        true,
+				MergeRequestsEvents: true,
+				TagPushEvents:       true,
+			}
+
+			hook, _, err := git.Projects.EditProjectHook(projectID, hooks[i].ID, optsEdit)
+			if err != nil {
+				log.Fatal(err)
+			}
+
 			return hook, err
 		}
 	}
