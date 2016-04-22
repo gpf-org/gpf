@@ -6,16 +6,15 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func CreateProjectHook(baseURL string, token string) (*gitlab.ProjectHook, error) {
+func CreateProjectHook(baseURL string, token string, projectID int) (*gitlab.ProjectHook, error) {
 	git := gitlab.NewClient(nil, token)
 	git.SetBaseURL(baseURL)
 
 	hookURL := baseURL + "/gpf-hooks"
 
 	// TODO: handle paging search
-	pid := 1
 	optsList := &gitlab.ListProjectHooksOptions{}
-	hooks, _, err := git.Projects.ListProjectHooks(pid, optsList)
+	hooks, _, err := git.Projects.ListProjectHooks(projectID, optsList)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,7 +33,7 @@ func CreateProjectHook(baseURL string, token string) (*gitlab.ProjectHook, error
 		TagPushEvents:       true,
 	}
 
-	hook, _, err := git.Projects.AddProjectHook(pid, optsAdd)
+	hook, _, err := git.Projects.AddProjectHook(projectID, optsAdd)
 	if err != nil {
 		log.Fatal(err)
 	}
