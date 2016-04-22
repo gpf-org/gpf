@@ -11,7 +11,8 @@ func CreateOrUpdateProjectHook(baseURL string, token string, projectID int) (*gi
 	git := gitlab.NewClient(nil, token)
 	git.SetBaseURL(baseURL)
 
-	hookURL := baseURL + "/gpf-hooks"
+	// TODO: Add parameter to receive the gpf server address
+	hookURL := "http://localhost:5544/reload"
 
 	// TODO: handle paging search
 	optsList := &gitlab.ListProjectHooksOptions{}
