@@ -19,6 +19,7 @@ var ReloadCmd = &cobra.Command{
 			fmt.Printf("%s\n", err)
 			os.Exit(1)
 		}
+		log.Printf("Projects available: %d", len(projs))
 
 		for _, proj := range projs {
 			log.Printf("Project %s: reloading webhook", *proj.Name)
