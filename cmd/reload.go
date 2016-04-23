@@ -21,8 +21,11 @@ var ReloadCmd = &cobra.Command{
 		}
 
 		for _, proj := range projs {
+			log.Printf("Project %s: reloading webhook", *proj.Name)
 			gpf.CreateOrUpdateProjectHook(BaseURL, Token, *proj.ID)
-			log.Printf(">>> Reloading webhook for project %s", *proj.Name)
+
+			log.Printf("Project %s: reloading information", *proj.Name)
+			// TODO: save project information into the gpf database
 		}
 	},
 }
