@@ -10,10 +10,6 @@ import (
 	"github.com/gpf-org/gpf/gpf"
 )
 
-type ReloadFlags struct {
-	status string
-}
-
 var ReloadCmd = &cobra.Command{
 	Use:   "reload",
 	Short: "reconfigure all projects configuration",
