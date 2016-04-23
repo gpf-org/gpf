@@ -7,14 +7,37 @@ func ListAllProjects(baseURL string, token string) ([]*gitlab.Project, error) {
 	git := gitlab.NewClient(nil, token)
 	git.SetBaseURL(baseURL)
 
-	// TODO: handle paging search
-	optsList := &gitlab.ListProjectsOptions{
+	result := make([]*gitlab.Project, 0)
+
+	options := &gitlab.ListProjectsOptions{
 		ListOptions: gitlab.ListOptions{
-			Page:    1,
-			PerPage: 99999999999,
+			PerPage: 100,
 		},
 	}
-	projs, _, err := git.Projects.ListAllProjects(optsList)
 
-	return projs, err
+	nextPage := true
+
+	for i := 1; nextPage; i++ {
+		options.Page = i
+
+		projects, _, err := git.Projects.ListProjects(options)
+
+		if err != nil {
+			return nil, err
+		}
+
+		count := len(projects)
+
+		switch true {
+		case count == 0:
+			nextPage = false
+		case count > 0:
+			acc := make([]*gitlab.Project, len(result)+count)
+			copy(acc, result)
+			copy(acc, projects)
+			result = acc
+		}
+	}
+
+	return result, nil
 }
