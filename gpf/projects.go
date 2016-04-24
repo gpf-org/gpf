@@ -7,7 +7,7 @@ func ListAllProjects(baseURL string, token string) ([]*gitlab.Project, error) {
 	git := gitlab.NewClient(nil, token)
 	git.SetBaseURL(baseURL)
 
-	result := make([]*gitlab.Project, 0)
+	result := []*gitlab.Project{}
 
 	options := &gitlab.ListProjectsOptions{
 		ListOptions: gitlab.ListOptions{
@@ -32,10 +32,7 @@ func ListAllProjects(baseURL string, token string) ([]*gitlab.Project, error) {
 		case count == 0:
 			nextPage = false
 		case count > 0:
-			acc := make([]*gitlab.Project, len(result)+count)
-			copy(acc, result)
-			copy(acc, projects)
-			result = acc
+			result = append(result, projects...)
 		}
 	}
 
