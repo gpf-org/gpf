@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/gpf-org/gpf/gpf"
+	"github.com/gpf-org/gpf/git"
 )
 
 type BranchesFlags struct {
@@ -25,7 +25,16 @@ var listBranchesCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List branches",
 	Run: func(cmd *cobra.Command, args []string) {
-		result, err := gpf.ListBranches(BaseURL, Token)
+		gp, err := git.NewProvider(BaseURL, Token, Provider)
+		if err != nil {
+			fmt.Printf("%s\n", err)
+			os.Exit(1)
+		}
+
+		// TODO: get pid by argument
+		pid := 1
+		var result []*git.Branch
+		result, err = gp.ListAllBranches(pid)
 		if err != nil {
 			fmt.Printf("%s\n", err)
 			os.Exit(1)

@@ -1,13 +1,12 @@
-package gpf
+package git
 
-import "github.com/xanzy/go-gitlab"
+import (
+	"github.com/xanzy/go-gitlab"
+)
 
 // ListAllProjects gets a list of all Git projects.
-func ListAllProjects(baseURL string, token string) ([]*gitlab.Project, error) {
-	git := gitlab.NewClient(nil, token)
-	git.SetBaseURL(baseURL)
-
-	result := []*gitlab.Project{}
+func (gp GitLabProvider) ListAllProjects() ([]*Project, error) {
+	result := []*Project{}
 
 	options := &gitlab.ListProjectsOptions{
 		ListOptions: gitlab.ListOptions{
@@ -20,7 +19,7 @@ func ListAllProjects(baseURL string, token string) ([]*gitlab.Project, error) {
 	for i := 1; nextPage; i++ {
 		options.Page = i
 
-		projects, _, err := git.Projects.ListProjects(options)
+		projects, _, err := gp.client.Projects.ListAllProjects(options)
 
 		if err != nil {
 			return nil, err
@@ -32,7 +31,9 @@ func ListAllProjects(baseURL string, token string) ([]*gitlab.Project, error) {
 		case count == 0:
 			nextPage = false
 		case count > 0:
-			result = append(result, projects...)
+			for _, value := range projects {
+				result = append(result, &Project{ID: value.ID, Name: value.Name})
+			}
 		}
 	}
 
