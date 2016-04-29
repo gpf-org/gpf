@@ -13,6 +13,9 @@ var ServerCmd = &cobra.Command{
 	Use:   "server",
 	Short: "A high performance gpf server",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if options.Provider == "" {
+			return errors.New("missing required provider flag")
+		}
 		if options.Token == "" {
 			return errors.New("missing required token flag")
 		}
@@ -25,6 +28,7 @@ var ServerCmd = &cobra.Command{
 }
 
 func init() {
+	ServerCmd.PersistentFlags().StringVarP(&options.Provider, "provider", "p", "", "Git provider (e.g. gitlab, github)")
 	ServerCmd.PersistentFlags().StringVarP(&options.Token, "token", "t", "", "Private token")
 	ServerCmd.PersistentFlags().StringVarP(&options.BaseURL, "baseURL", "", "https://gitlab.com/api/v3", "Base URL")
 	ServerCmd.PersistentFlags().StringVarP(&options.PublicURL, "publicURL", "", "http://localhost:5544", "Public URL")

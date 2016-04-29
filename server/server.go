@@ -1,15 +1,19 @@
 package server
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/gpf-org/gpf/git"
 )
 
 type ServerOptions struct {
+	Provider  string
 	Token     string
 	BaseURL   string
 	PublicURL string
@@ -19,20 +23,22 @@ type ServerOptions struct {
 
 type Server struct {
 	status ServerStatus
+	git    git.GitProvider
 }
 
 func (s *Server) Start(options *ServerOptions) error {
+	gp, err := git.NewProvider(options.BaseURL, options.Token, options.Provider)
+	if err != nil {
+		fmt.Printf("%s\n", err)
+		os.Exit(1)
+	}
+
+	s.git = gp
+
 	s.reload()
 
 	router := s.createRouter()
 	return listenAndServe(options.Bind, options.Port, router)
-}
-
-func (s *Server) reload() {
-	s.status = StatusMaintenance
-	// reload project information
-	// ensure each project has webhook set
-	s.status = StatusOK
 }
 
 func (s *Server) createRouter() http.Handler {
