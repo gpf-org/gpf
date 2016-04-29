@@ -8,6 +8,7 @@ type GitProvider interface {
 	ListAllProjects() ([]*Project, error)
 	ListAllBranches(pid int) ([]*Branch, error)
 	CreateOrUpdateProjectHook(pid int) (*ProjectHook, error)
+	CreateMergeRequest(pid int, opts CreateMergeRequestOptions) (*MergeRequest, error)
 }
 
 type Project struct {
