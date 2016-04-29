@@ -18,7 +18,7 @@ func (s *Server) reload() {
 
 	for _, proj := range projs {
 		log.Printf("Project %s: reloading webhook", *proj.Name)
-		// s.git.CreateOrUpdateProjectHook(*proj.ID)
+		s.git.CreateOrUpdateProjectHook(*proj.ID)
 
 		log.Printf("Project %s: reloading information", *proj.Name)
 		// TODO: save project information into the gpf database
