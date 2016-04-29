@@ -29,6 +29,30 @@ type ProjectHook struct {
 	MergeRequestsEvents bool
 }
 
+type MergeRequest struct {
+	// It has available more fields.
+	// Include only those really used.
+	ID             int
+	ProjectID      int
+	Title          string
+	Description    string
+	WorkInProgress bool
+	State          string
+	TargetBranch   string
+	SourceBranch   string
+	Upvotes        int
+	Downvotes      int
+}
+
+type CreateMergeRequestOptions struct {
+	Title           string
+	Description     string
+	SourceBranch    string
+	TargetBranch    string
+	AssigneeID      int
+	TargetProjectID int
+}
+
 // NewProvider creates a git provider based in the provider type
 func NewProvider(baseURL string, token string, providerType string) (GitProvider, error) {
 	switch providerType {
