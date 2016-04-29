@@ -6,6 +6,8 @@ import (
 
 // ListAllProjects gets a list of all Git projects.
 func (gp GitLabProvider) ListAllProjects() ([]*Project, error) {
+	user, _, _ := gp.client.Users.CurrentUser()
+
 	result := []*Project{}
 
 	options := &gitlab.ListProjectsOptions{
@@ -19,8 +21,7 @@ func (gp GitLabProvider) ListAllProjects() ([]*Project, error) {
 	for i := 1; nextPage; i++ {
 		options.Page = i
 
-		projects, _, err := gp.client.Projects.ListAllProjects(options)
-
+		projects, _, err := gp.listProjects(user.IsAdmin, options)
 		if err != nil {
 			return nil, err
 		}
@@ -38,4 +39,12 @@ func (gp GitLabProvider) ListAllProjects() ([]*Project, error) {
 	}
 
 	return result, nil
+}
+
+func (gp GitLabProvider) listProjects(isAdmin bool, options *gitlab.ListProjectsOptions) ([]*gitlab.Project, *gitlab.Response, error) {
+	if isAdmin {
+		return gp.client.Projects.ListAllProjects(options)
+	} else {
+		return gp.client.Projects.ListProjects(options)
+	}
 }
