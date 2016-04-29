@@ -21,9 +21,15 @@ type ServerOptions struct {
 	Port      int
 }
 
+type GitData struct {
+	projects []*git.Project
+	branches []*git.Branch
+}
+
 type Server struct {
 	status ServerStatus
 	git    git.GitProvider
+	data   GitData
 }
 
 func (s *Server) Start(options *ServerOptions) error {

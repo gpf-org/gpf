@@ -16,7 +16,8 @@ type Project struct {
 }
 
 type Branch struct {
-	Name string
+	Name      string
+	ProjectID int
 }
 
 type ProjectHook struct {

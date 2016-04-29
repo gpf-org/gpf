@@ -6,7 +6,7 @@ func (gp GitLabProvider) ListAllBranches(pid int) ([]*Branch, error) {
 	branches := make([]*Branch, len(result))
 
 	for _, value := range result {
-		branches = append(branches, &Branch{Name: value.Name})
+		branches = append(branches, &Branch{Name: value.Name, ProjectID: pid})
 	}
 
 	return branches, err
