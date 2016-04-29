@@ -22,8 +22,9 @@ type ServerOptions struct {
 }
 
 type GitData struct {
-	projects []*git.Project
-	branches []*git.Branch
+	projects      []*git.Project
+	branches      []*git.Branch
+	mergeRequests []*git.MergeRequest
 }
 
 type Server struct {
