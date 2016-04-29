@@ -69,5 +69,6 @@ func (s *Server) reloadHandler() http.HandlerFunc {
 
 func listenAndServe(bind string, port int, handler http.Handler) error {
 	addr := bind + ":" + strconv.Itoa(port)
+	log.Printf("Server running on http://%s", addr)
 	return http.ListenAndServe(addr, handler)
 }
