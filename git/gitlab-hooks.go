@@ -62,8 +62,8 @@ func mapToProjectHook(data *gitlab.ProjectHook) *ProjectHook {
 func mapToProjectHooks(data []*gitlab.ProjectHook) []*ProjectHook {
 	hooks := make([]*ProjectHook, len(data))
 
-	for _, value := range data {
-		hooks = append(hooks, mapToProjectHook(value))
+	for i, value := range data {
+		hooks[i] = mapToProjectHook(value)
 	}
 
 	return hooks
