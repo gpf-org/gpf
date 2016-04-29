@@ -18,18 +18,40 @@ func (gp GitLabProvider) CreateMergeRequest(pid int, opts CreateMergeRequestOpti
 		return nil, err
 	}
 
-	mr := &MergeRequest{
-		ID:             result.ID,
-		ProjectID:      result.ProjectID,
-		Title:          result.Title,
-		Description:    result.Description,
-		WorkInProgress: result.WorkInProgress,
-		State:          result.State,
-		TargetBranch:   result.TargetBranch,
-		SourceBranch:   result.SourceBranch,
-		Upvotes:        result.Upvotes,
-		Downvotes:      result.Downvotes,
+	return mapToMergeRequest(result), nil
+}
+
+// ListMergeRequests fetch all the merge requests for a project
+func (gp GitLabProvider) ListMergeRequests(pid int) ([]*MergeRequest, error) {
+	// TODO: handle paging search
+	opts := &gitlab.ListMergeRequestsOptions{
+		ListOptions: gitlab.ListOptions{
+			Page:    1,
+			PerPage: 99999999999,
+		},
+	}
+	result, _, err := gp.client.MergeRequests.ListMergeRequests(pid, opts)
+
+	mrs := []*MergeRequest{}
+
+	for i, value := range result {
+		mrs[i] = mapToMergeRequest(value)
 	}
 
-	return mr, nil
+	return mrs, err
+}
+
+func mapToMergeRequest(data *gitlab.MergeRequest) *MergeRequest {
+	return &MergeRequest{
+		ID:             data.ID,
+		ProjectID:      data.ProjectID,
+		Title:          data.Title,
+		Description:    data.Description,
+		WorkInProgress: data.WorkInProgress,
+		State:          data.State,
+		TargetBranch:   data.TargetBranch,
+		SourceBranch:   data.SourceBranch,
+		Upvotes:        data.Upvotes,
+		Downvotes:      data.Downvotes,
+	}
 }
