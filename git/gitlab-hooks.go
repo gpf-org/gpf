@@ -12,6 +12,9 @@ func (gp GitLabProvider) CreateOrUpdateProjectHook(pid int) (*ProjectHook, error
 	// TODO: handle paging search
 	optsList := &gitlab.ListProjectHooksOptions{}
 	result, _, err := gp.client.Projects.ListProjectHooks(pid, optsList)
+	if err != nil {
+		return nil, err
+	}
 
 	hooks := mapToProjectHooks(result)
 
