@@ -28,9 +28,8 @@ type GitData struct {
 }
 
 type Server struct {
-	status ServerStatus
-	git    git.GitProvider
-	data   GitData
+	git  git.GitProvider
+	data GitData
 }
 
 func (s *Server) Start(options *ServerOptions) error {
@@ -53,15 +52,7 @@ func (s *Server) createRouter() http.Handler {
 
 	router.HandleFunc("/reload", s.reloadHandler())
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Status: %s", ServerStatusText(s.status))
-		switch s.status {
-		case StatusOK:
-			router.ServeHTTP(w, r)
-		case StatusMaintenance:
-			w.WriteHeader(http.StatusServiceUnavailable)
-		}
-	})
+	return router
 }
 
 func (s *Server) reloadHandler() http.HandlerFunc {

@@ -14,7 +14,6 @@ var (
 )
 
 func (s *Server) reload() {
-	s.status = StatusMaintenance
 	log.Printf("Reloading the server. It may take awhile.")
 
 	projs, err := s.git.ListAllProjects()
@@ -51,6 +50,4 @@ func (s *Server) reload() {
 		}
 		s.data.mergeRequests = append(s.data.mergeRequests, mrs...)
 	}
-
-	s.status = StatusOK
 }
