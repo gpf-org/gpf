@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"log"
 
 	"github.com/gpf-org/gpf/server"
 	"github.com/spf13/cobra"
@@ -23,7 +24,10 @@ var ServerCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		s := server.Server{}
-		s.Start(options)
+		if err := s.Start(options); err != nil {
+			log.Fatal("Failed to start server: ", err)
+		}
+
 	},
 }
 
