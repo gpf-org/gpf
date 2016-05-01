@@ -10,6 +10,13 @@ import (
 	"github.com/gpf-org/gpf/git"
 )
 
+type ServerModel interface {
+	UpdateProject(project *git.Project)
+	UpdateBranches(branches []*git.Branch)
+	UpdateMergeRequests(mergeRequests []*git.MergeRequest)
+	// TODO: Add relevant methods to traverse projects, branches and merge requests
+}
+
 type ServerOptions struct {
 	Provider  string
 	Token     string
@@ -19,16 +26,10 @@ type ServerOptions struct {
 	Port      int
 }
 
-type GitData struct {
-	projects      []*git.Project
-	branches      []*git.Branch
-	mergeRequests []*git.MergeRequest
-}
-
 type Server struct {
 	options *ServerOptions
 	git     git.GitProvider
-	data    GitData
+	model   ServerModel
 }
 
 func NewServer(options *ServerOptions) (*Server, error) {
@@ -37,7 +38,9 @@ func NewServer(options *ServerOptions) (*Server, error) {
 		return nil, err
 	}
 
-	return &Server{options: options, git: git}, nil
+	model := &MemoryModel{}
+
+	return &Server{options: options, git: git, model: model}, nil
 }
 
 func (s *Server) ListenAndServe() error {

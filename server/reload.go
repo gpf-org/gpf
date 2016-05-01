@@ -22,13 +22,9 @@ func (s *Server) Reload() error {
 
 	log.Printf("Projects available: %d", len(projs))
 
-	s.data = GitData{
-		projects:      projs,
-		branches:      []*git.Branch{},
-		mergeRequests: []*git.MergeRequest{},
-	}
-
 	for _, proj := range projs {
+		s.model.UpdateProject(proj)
+
 		log.Printf("Project %s: reloading webhook", *proj.Name)
 		s.git.CreateOrUpdateProjectHook(*proj.ID, s.options.PublicURL)
 
@@ -37,14 +33,16 @@ func (s *Server) Reload() error {
 		if err != nil {
 			return err
 		}
-		s.data.branches = append(s.data.branches, branches...)
+
+		s.model.UpdateBranches(branches)
 
 		log.Printf("Project %s: reloading merge requests", *proj.Name)
 		mrs, err = s.git.ListMergeRequests(*proj.ID)
 		if err != nil {
 			return err
 		}
-		s.data.mergeRequests = append(s.data.mergeRequests, mrs...)
+
+		s.model.UpdateMergeRequests(mrs)
 	}
 
 	return nil
