@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gpf-org/gpf/git"
@@ -13,13 +12,12 @@ var (
 	mrs      []*git.MergeRequest
 )
 
-func (s *Server) reload() {
+func (s *Server) Reload() error {
 	log.Printf("Reloading the server. It may take awhile.")
 
 	projs, err := s.git.ListAllProjects()
 	if err != nil {
-		fmt.Printf("%s\n", err)
-		return
+		return err
 	}
 
 	log.Printf("Projects available: %d", len(projs))
@@ -37,17 +35,17 @@ func (s *Server) reload() {
 		log.Printf("Project %s: reloading branches", *proj.Name)
 		branches, err = s.git.ListAllBranches(*proj.ID)
 		if err != nil {
-			fmt.Printf("%s\n", err)
-			return
+			return err
 		}
 		s.data.branches = append(s.data.branches, branches...)
 
 		log.Printf("Project %s: reloading merge requests", *proj.Name)
 		mrs, err = s.git.ListMergeRequests(*proj.ID)
 		if err != nil {
-			fmt.Printf("%s\n", err)
-			return
+			return err
 		}
 		s.data.mergeRequests = append(s.data.mergeRequests, mrs...)
 	}
+
+	return nil
 }

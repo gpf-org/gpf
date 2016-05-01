@@ -1,11 +1,9 @@
 package server
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -28,23 +26,28 @@ type GitData struct {
 }
 
 type Server struct {
-	git  git.GitProvider
-	data GitData
+	options *ServerOptions
+	git     git.GitProvider
+	data    GitData
 }
 
-func (s *Server) Start(options *ServerOptions) error {
-	gp, err := git.NewProvider(options.BaseURL, options.Token, options.Provider)
+func NewServer(options *ServerOptions) (*Server, error) {
+	git, err := git.NewProvider(options.BaseURL, options.Token, options.Provider)
 	if err != nil {
-		fmt.Printf("%s\n", err)
-		os.Exit(1)
+		return nil, err
 	}
 
-	s.git = gp
+	return &Server{options: options, git: git}, nil
+}
 
-	s.reload()
-
+func (s *Server) ListenAndServe() error {
 	router := s.createRouter()
-	return listenAndServe(options.Bind, options.Port, router)
+
+	addr := s.options.Bind + ":" + strconv.Itoa(s.options.Port)
+
+	log.Printf("Server running on http://%s", addr)
+
+	return http.ListenAndServe(addr, router)
 }
 
 func (s *Server) createRouter() http.Handler {
@@ -57,16 +60,10 @@ func (s *Server) createRouter() http.Handler {
 
 func (s *Server) reloadHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.reload()
+		s.Reload()
 
 		w.WriteHeader(http.StatusOK)
 
 		io.WriteString(w, "reload")
 	})
-}
-
-func listenAndServe(bind string, port int, handler http.Handler) error {
-	addr := bind + ":" + strconv.Itoa(port)
-	log.Printf("Server running on http://%s", addr)
-	return http.ListenAndServe(addr, handler)
 }

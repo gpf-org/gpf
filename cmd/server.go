@@ -23,11 +23,18 @@ var ServerCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		s := server.Server{}
-		if err := s.Start(options); err != nil {
-			log.Fatal("Failed to start server: ", err)
+		s, err := server.NewServer(options)
+		if err != nil {
+			log.Fatal("Failed to create server instance: ", err)
 		}
 
+		if err := s.Reload(); err != nil {
+			log.Fatal("Failed to reload server data: ", err)
+		}
+
+		if err := s.ListenAndServe(); err != nil {
+			log.Fatal("Failed to start listening: ", err)
+		}
 	},
 }
 
