@@ -54,6 +54,6 @@ gpf code-review accept "my-feature"
 gpf qa request "my-feature"
 gpf qa start "my-feature"
 gpf qa approve "my-feature"
-gpf qa refuse "my-feature"
+gpf qa reject "my-feature"
 ```
 
