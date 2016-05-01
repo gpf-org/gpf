@@ -7,7 +7,7 @@ import "errors"
 type GitProvider interface {
 	ListAllProjects() ([]*Project, error)
 	ListAllBranches(pid int) ([]*Branch, error)
-	CreateOrUpdateProjectHook(pid int) (*ProjectHook, error)
+	CreateOrUpdateProjectHook(pid int, hookURL string) (*ProjectHook, error)
 	CreateMergeRequest(pid int, opts CreateMergeRequestOptions) (*MergeRequest, error)
 	ListMergeRequests(pid int) ([]*MergeRequest, error)
 }

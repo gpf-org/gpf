@@ -5,10 +5,7 @@ import (
 )
 
 // CreateOrUpdateProjectHook creates a hook to a specified project or update it if already exists.
-func (gp GitLabProvider) CreateOrUpdateProjectHook(pid int) (*ProjectHook, error) {
-	// TODO: Add parameter to receive the gpf server address
-	hookURL := "http://localhost:5544/reload"
-
+func (gp GitLabProvider) CreateOrUpdateProjectHook(pid int, hookURL string) (*ProjectHook, error) {
 	// TODO: handle paging search
 	optsList := &gitlab.ListProjectHooksOptions{}
 	result, _, err := gp.client.Projects.ListProjectHooks(pid, optsList)

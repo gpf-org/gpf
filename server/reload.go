@@ -30,7 +30,7 @@ func (s *Server) Reload() error {
 
 	for _, proj := range projs {
 		log.Printf("Project %s: reloading webhook", *proj.Name)
-		s.git.CreateOrUpdateProjectHook(*proj.ID)
+		s.git.CreateOrUpdateProjectHook(*proj.ID, s.options.PublicURL)
 
 		log.Printf("Project %s: reloading branches", *proj.Name)
 		branches, err = s.git.ListAllBranches(*proj.ID)
