@@ -33,7 +33,7 @@ func (gp GitLabProvider) ListAllProjects() ([]*Project, error) {
 			nextPage = false
 		case count > 0:
 			for _, value := range projects {
-				result = append(result, &Project{ID: value.ID, Name: value.Name})
+				result = append(result, &Project{ID: *value.ID, Name: *value.Name})
 			}
 		}
 	}

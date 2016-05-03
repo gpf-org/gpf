@@ -13,8 +13,8 @@ type GitProvider interface {
 }
 
 type Project struct {
-	ID   *int
-	Name *string
+	ID   int
+	Name string
 }
 
 type Branch struct {
