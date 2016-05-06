@@ -33,6 +33,9 @@ func (gp GitLabProvider) ListAllProjects() ([]*Project, error) {
 			nextPage = false
 		case count > 0:
 			for _, value := range projects {
+				if value.DefaultBranch == nil {
+					continue
+				}
 				result = append(result, &Project{ID: *value.ID, Name: *value.Name})
 			}
 		}
