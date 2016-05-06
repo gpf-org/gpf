@@ -1,6 +1,8 @@
 package git
 
-import "github.com/xanzy/go-gitlab"
+import (
+	"github.com/xanzy/go-gitlab"
+)
 
 // CreateMergeRequest creates a new merge request for a branch.
 func (gp GitLabProvider) CreateMergeRequest(pid int, opts CreateMergeRequestOptions) (*MergeRequest, error) {
@@ -23,22 +25,37 @@ func (gp GitLabProvider) CreateMergeRequest(pid int, opts CreateMergeRequestOpti
 
 // ListMergeRequests fetch all the merge requests for a project
 func (gp GitLabProvider) ListMergeRequests(pid int) ([]*MergeRequest, error) {
-	// TODO: handle paging search
-	opts := &gitlab.ListMergeRequestsOptions{
+	result := []*MergeRequest{}
+
+	options := &gitlab.ListMergeRequestsOptions{
 		ListOptions: gitlab.ListOptions{
-			Page:    1,
-			PerPage: 99999999999,
+			PerPage: 100,
 		},
 	}
-	result, _, err := gp.client.MergeRequests.ListMergeRequests(pid, opts)
 
-	mrs := []*MergeRequest{}
+	nextPage := true
 
-	for i, value := range result {
-		mrs[i] = mapToMergeRequest(value)
+	for i := 1; nextPage; i++ {
+		options.Page = i
+
+		mrs, _, err := gp.client.MergeRequests.ListMergeRequests(pid, options)
+		if err != nil {
+			return nil, err
+		}
+
+		count := len(mrs)
+
+		switch {
+		case count == 0:
+			nextPage = false
+		case count > 0:
+			for _, value := range mrs {
+				result = append(result, mapToMergeRequest(value))
+			}
+		}
 	}
 
-	return mrs, err
+	return result, nil
 }
 
 func mapToMergeRequest(data *gitlab.MergeRequest) *MergeRequest {
