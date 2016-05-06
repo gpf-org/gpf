@@ -6,6 +6,7 @@ func main() {
 	cmd.RootCmd.AddCommand(cmd.ServerCmd)
 	cmd.RootCmd.AddCommand(cmd.BrahnchesCmd)
 	cmd.RootCmd.AddCommand(cmd.ReloadCmd)
+	cmd.RootCmd.AddCommand(cmd.ListCmd)
 	cmd.RootCmd.AddCommand(cmd.VersionCmd)
 	cmd.RootCmd.Execute()
 }

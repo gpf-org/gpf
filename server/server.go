@@ -1,21 +1,16 @@
 package server
 
 import (
+	"encoding/json"
 	"io"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/gpf-org/gpf/git"
 )
-
-type ServerModel interface {
-	UpdateProject(project *git.Project)
-	UpdateBranches(branches []*git.Branch)
-	UpdateMergeRequests(mergeRequests []*git.MergeRequest)
-	// TODO: Add relevant methods to traverse projects, branches and merge requests
-}
 
 type ServerOptions struct {
 	Provider  string
@@ -38,7 +33,9 @@ func NewServer(options *ServerOptions) (*Server, error) {
 		return nil, err
 	}
 
-	model := &MemoryModel{}
+	model := &MemoryModel{
+		pattern: regexp.MustCompile("^([^/]+)/.*$"),
+	}
 
 	return &Server{options: options, git: git, model: model}, nil
 }
@@ -57,6 +54,7 @@ func (s *Server) createRouter() http.Handler {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/reload", s.reloadHandler())
+	router.HandleFunc("/list", s.listHandler())
 
 	return router
 }
@@ -68,5 +66,18 @@ func (s *Server) reloadHandler() http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 
 		io.WriteString(w, "reload")
+	})
+}
+
+func (s *Server) listHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		data, err := json.Marshal(s.model.List())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(data)
 	})
 }
