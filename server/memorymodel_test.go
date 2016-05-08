@@ -22,30 +22,53 @@ func TestMemoryModelList(t *testing.T) {
 			{Name: "issue-1/abc-123", ProjectID: 1},
 			{Name: "issue-30/ola-mundo", ProjectID: 2},
 		},
-		mergeRequests: []*git.MergeRequest{},
+		mergeRequests: []*git.MergeRequest{
+			{
+				State:           "open",
+				SourceBranch:    "issue-12/hello-world",
+				TargetBranch:    "develop",
+				TargetProjectID: 1,
+			},
+		},
 	}
 
 	expected := []*Feature{
 		{
-			Name:   "issue-1",
-			Status: "unknown",
+			Name:     "issue-1",
+			Commands: []string{"code-review request"},
 			Branches: []*FeatureBranch{
-				{BranchName: "issue-1/remove-pointers", ProjectName: "Project B"},
-				{BranchName: "issue-1/abc-123", ProjectName: "Project C"},
+				{
+					BranchName:  "issue-1/remove-pointers",
+					ProjectID:   3,
+					ProjectName: "Project B",
+				},
+				{
+					BranchName:  "issue-1/abc-123",
+					ProjectID:   1,
+					ProjectName: "Project C",
+				},
 			},
 		},
 		{
-			Name:   "issue-12",
-			Status: "unknown",
+			Name:     "issue-12",
+			Commands: []string{},
 			Branches: []*FeatureBranch{
-				{BranchName: "issue-12/hello-world", ProjectName: "Project C"},
+				{
+					BranchName:  "issue-12/hello-world",
+					ProjectID:   1,
+					ProjectName: "Project C",
+				},
 			},
 		},
 		{
-			Name:   "issue-30",
-			Status: "unknown",
+			Name:     "issue-30",
+			Commands: []string{"code-review request"},
 			Branches: []*FeatureBranch{
-				{BranchName: "issue-30/ola-mundo", ProjectName: "Project A"},
+				{
+					BranchName:  "issue-30/ola-mundo",
+					ProjectID:   2,
+					ProjectName: "Project A",
+				},
 			},
 		},
 	}

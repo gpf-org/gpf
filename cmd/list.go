@@ -48,10 +48,16 @@ var ListCmd = &cobra.Command{
 
 		fmt.Printf("Found %d features\n", len(features))
 		for _, feature := range features {
-			fmt.Printf("* feature %s (status: %s)\n", feature.Name, feature.Status)
+			fmt.Printf("* feature: %s\n", feature.Name)
 
+			fmt.Printf("\tprojects:\n")
 			for _, branch := range feature.Branches {
-				fmt.Printf("\tproject: %s - branch: %s\n", branch.ProjectName, branch.BranchName)
+				fmt.Printf("\t\tproject: %s - branch: %s\n", branch.ProjectName, branch.BranchName)
+			}
+
+			fmt.Printf("\tcommands:\n")
+			for _, command := range feature.Commands {
+				fmt.Printf("\t\tcommand: %s\n", command)
 			}
 		}
 	},

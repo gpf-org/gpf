@@ -44,7 +44,7 @@ func (m *MemoryModel) List() []*Feature {
 		if !ok {
 			feature = &Feature{
 				Name:     name,
-				Status:   "unknown",
+				Commands: []string{},
 				Branches: make([]*FeatureBranch, 0),
 			}
 			features[name] = feature
@@ -52,13 +52,32 @@ func (m *MemoryModel) List() []*Feature {
 
 		featureBranch := &FeatureBranch{
 			BranchName:  branch.Name,
+			ProjectID:   branch.ProjectID,
 			ProjectName: m.getProjectName(branch.ProjectID),
 		}
 
 		feature.Branches = append(feature.Branches, featureBranch)
 	}
 
-	// TODO calculate status of each branch
+	// command: code-review request
+	for _, feature := range features {
+		mergeRequestOpenToDevelop := false
+
+		for _, branch := range feature.Branches {
+			exists := m.existMergeRequest(&FindMergeRequestOptions{
+				SourceBranch:    branch.BranchName,
+				TargetBranch:    "develop",
+				TargetProjectID: branch.ProjectID,
+				State:           "open",
+			})
+
+			mergeRequestOpenToDevelop = mergeRequestOpenToDevelop || exists
+		}
+
+		if !mergeRequestOpenToDevelop {
+			feature.Commands = append(feature.Commands, "code-review request")
+		}
+	}
 
 	result := make([]*Feature, 0, len(features))
 
@@ -71,6 +90,45 @@ func (m *MemoryModel) List() []*Feature {
 	sort.Sort(ByFeature(result))
 
 	return result
+}
+
+type FindMergeRequestOptions struct {
+	SourceBranch    string
+	TargetBranch    string
+	State           string
+	TargetProjectID int
+}
+
+func (m *MemoryModel) existMergeRequest(options *FindMergeRequestOptions) bool {
+	for _, mergeRequest := range m.mergeRequests {
+		if !matchIntOption(options.TargetProjectID, mergeRequest.TargetProjectID) {
+			continue
+		}
+
+		if !matchStringOption(options.SourceBranch, mergeRequest.SourceBranch) {
+			continue
+		}
+
+		if !matchStringOption(options.TargetBranch, mergeRequest.TargetBranch) {
+			continue
+		}
+
+		if !matchStringOption(options.State, mergeRequest.State) {
+			continue
+		}
+
+		return true
+	}
+
+	return false
+}
+
+func matchStringOption(option string, value string) bool {
+	return option == "" || option == value
+}
+
+func matchIntOption(option int, value int) bool {
+	return option == 0 || option == value
 }
 
 func (m *MemoryModel) getProjectName(projectID int) string {

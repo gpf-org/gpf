@@ -5,13 +5,14 @@ import (
 )
 
 type FeatureBranch struct {
+	ProjectID   int    `json:"project_id"`
 	ProjectName string `json:"project_name"`
 	BranchName  string `json:"branch_name"`
 }
 
 type Feature struct {
 	Name     string           `json:"name"`
-	Status   string           `json:"status"`
+	Commands []string         `json:"commands"`
 	Branches []*FeatureBranch `json:"branches,omitempty"`
 }
 

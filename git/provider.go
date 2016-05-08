@@ -34,16 +34,17 @@ type ProjectHook struct {
 type MergeRequest struct {
 	// It has available more fields.
 	// Include only those really used.
-	ID             int
-	ProjectID      int
-	Title          string
-	Description    string
-	WorkInProgress bool
-	State          string
-	TargetBranch   string
-	SourceBranch   string
-	Upvotes        int
-	Downvotes      int
+	ID              int
+	ProjectID       int
+	Title           string
+	Description     string
+	WorkInProgress  bool
+	State           string
+	TargetBranch    string
+	SourceBranch    string
+	Upvotes         int
+	Downvotes       int
+	TargetProjectID int
 }
 
 type CreateMergeRequestOptions struct {

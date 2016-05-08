@@ -60,15 +60,16 @@ func (gp GitLabProvider) ListMergeRequests(pid int) ([]*MergeRequest, error) {
 
 func mapToMergeRequest(data *gitlab.MergeRequest) *MergeRequest {
 	return &MergeRequest{
-		ID:             data.ID,
-		ProjectID:      data.ProjectID,
-		Title:          data.Title,
-		Description:    data.Description,
-		WorkInProgress: data.WorkInProgress,
-		State:          data.State,
-		TargetBranch:   data.TargetBranch,
-		SourceBranch:   data.SourceBranch,
-		Upvotes:        data.Upvotes,
-		Downvotes:      data.Downvotes,
+		ID:              data.ID,
+		ProjectID:       data.ProjectID,
+		Title:           data.Title,
+		Description:     data.Description,
+		WorkInProgress:  data.WorkInProgress,
+		State:           data.State,
+		TargetBranch:    data.TargetBranch,
+		SourceBranch:    data.SourceBranch,
+		Upvotes:         data.Upvotes,
+		Downvotes:       data.Downvotes,
+		TargetProjectID: data.TargetProjectID,
 	}
 }
