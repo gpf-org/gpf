@@ -11,26 +11,31 @@ import (
 func TestMemoryModelList(t *testing.T) {
 	m := &MemoryModel{
 		pattern: regexp.MustCompile("^([^/]+)/.*$"),
-		projects: []*git.Project{
-			{ID: 1, Name: "Project C"},
-			{ID: 2, Name: "Project A"},
-			{ID: 3, Name: "Project B"},
-		},
-		branches: []*git.Branch{
-			{Name: "issue-1/remove-pointers", ProjectID: 3},
-			{Name: "issue-12/hello-world", ProjectID: 1},
-			{Name: "issue-1/abc-123", ProjectID: 1},
-			{Name: "issue-30/ola-mundo", ProjectID: 2},
-		},
-		mergeRequests: []*git.MergeRequest{
-			{
-				State:           "open",
-				SourceBranch:    "issue-12/hello-world",
-				TargetBranch:    "develop",
-				TargetProjectID: 1,
-			},
-		},
 	}
+
+	m.UpdateProject(&git.Project{ID: 1, Name: "Project C"})
+	m.UpdateBranches([]*git.Branch{
+		{ProjectID: 1, Name: "issue-12/hello-world"},
+		{ProjectID: 1, Name: "issue-1/abc-123"},
+	})
+	m.UpdateMergeRequests([]*git.MergeRequest{
+		{
+			State:           "open",
+			SourceBranch:    "issue-12/hello-world",
+			TargetBranch:    "develop",
+			TargetProjectID: 1,
+		},
+	})
+
+	m.UpdateProject(&git.Project{ID: 2, Name: "Project A"})
+	m.UpdateBranches([]*git.Branch{
+		{ProjectID: 2, Name: "issue-30/ola-mundo"},
+	})
+
+	m.UpdateProject(&git.Project{ID: 3, Name: "Project B"})
+	m.UpdateBranches([]*git.Branch{
+		{ProjectID: 3, Name: "issue-1/remove-pointers"},
+	})
 
 	expected := []*Feature{
 		{
