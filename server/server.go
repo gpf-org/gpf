@@ -92,36 +92,36 @@ func (s *Server) Reload() error {
 	return nil
 }
 
+func (s *Server) ListIssues() []*core.Issue {
+	return core.ListIssues(s.store)
+}
+
 func (s *Server) createRouter() http.Handler {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/reload", s.reloadHandler()).
+	router.HandleFunc("/reload", s.reloadHandler).
 		Methods("GET")
-	router.HandleFunc("/issues", s.listHandler()).
+	router.HandleFunc("/issues", s.listHandler).
 		Methods("GET")
 
 	return router
 }
 
-func (s *Server) reloadHandler() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.Reload()
+func (s *Server) reloadHandler(w http.ResponseWriter, r *http.Request) {
+	s.Reload()
 
-		w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusOK)
 
-		io.WriteString(w, "reload")
-	})
+	io.WriteString(w, "reload")
 }
 
-func (s *Server) listHandler() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		data, err := json.Marshal(core.ListIssues(s.store))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+func (s *Server) listHandler(w http.ResponseWriter, r *http.Request) {
+	data, err := json.Marshal(s.ListIssues())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(data)
-	})
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
 }
