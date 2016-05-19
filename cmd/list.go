@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gpf-org/gpf/server"
 	"github.com/spf13/cobra"
+
+	"github.com/gpf-org/gpf/core"
 )
 
 type ListFlags struct {
@@ -36,28 +37,27 @@ var ListCmd = &cobra.Command{
 
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			fmt.Printf("unable to retrieve list of features")
+			fmt.Printf("unable to retrieve list of issues")
 			os.Exit(1)
 		}
 
-		features := make([]server.Feature, 0)
-		if err := json.Unmarshal(body, &features); err != nil {
-			fmt.Printf("unable to decode list of features")
+		issues := make([]core.Issue, 0)
+		if err := json.Unmarshal(body, &issues); err != nil {
+			fmt.Printf("unable to decode list of issues")
 			os.Exit(1)
 		}
 
-		fmt.Printf("Found %d features\n", len(features))
-		for _, feature := range features {
-			fmt.Printf("* feature: %s\n", feature.Name)
+		for _, issue := range issues {
+			fmt.Printf("* issue: %s\n", issue.Name)
 
 			fmt.Printf("\tprojects:\n")
-			for _, branch := range feature.Branches {
-				fmt.Printf("\t\tproject: %s - branch: %s\n", branch.ProjectName, branch.BranchName)
+			for _, issueBranch := range issue.IssueBranches {
+				fmt.Printf("\t\tproject: %s - branch: %s\n", issueBranch.ProjectName, issueBranch.BranchName)
 			}
 
 			fmt.Printf("\tcommands:\n")
-			for _, command := range feature.Commands {
-				fmt.Printf("\t\tcommand: %s\n", command)
+			for _, command := range issue.Commands {
+				fmt.Printf("\t\tcommand: %s\n", core.CommandText(command))
 			}
 		}
 	},

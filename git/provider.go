@@ -8,7 +8,7 @@ type GitProvider interface {
 	ListAllProjects() ([]*Project, error)
 	ListAllBranches(pid int) ([]*Branch, error)
 	CreateOrUpdateProjectHook(pid int, hookURL string) (*ProjectHook, error)
-	CreateMergeRequest(pid int, opts CreateMergeRequestOptions) (*MergeRequest, error)
+	CreateMergeRequest(opts *CreateMergeRequestOptions) (*MergeRequest, error)
 	ListMergeRequests(pid int) ([]*MergeRequest, error)
 }
 
@@ -20,6 +20,7 @@ type Project struct {
 type Branch struct {
 	Name      string
 	ProjectID int
+	ParentIDs []string
 }
 
 type ProjectHook struct {
@@ -32,28 +33,17 @@ type ProjectHook struct {
 }
 
 type MergeRequest struct {
-	// It has available more fields.
-	// Include only those really used.
-	ID              int
-	ProjectID       int
-	Title           string
-	Description     string
-	WorkInProgress  bool
-	State           string
-	TargetBranch    string
-	SourceBranch    string
-	Upvotes         int
-	Downvotes       int
-	TargetProjectID int
+	ID           int
+	ProjectID    int
+	SourceBranch string
+	TargetBranch string
 }
 
 type CreateMergeRequestOptions struct {
-	Title           string
-	Description     string
-	SourceBranch    string
-	TargetBranch    string
-	AssigneeID      int
-	TargetProjectID int
+	Title        string
+	SourceBranch string
+	TargetBranch string
+	ProjectID    int
 }
 
 // NewProvider creates a git provider based in the provider type

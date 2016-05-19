@@ -91,17 +91,15 @@ func mapToProjectHooks(data []*gitlab.ProjectHook) []*ProjectHook {
 }
 
 // CreateMergeRequest creates a new merge request for a branch.
-func (gp GitLabProvider) CreateMergeRequest(pid int, opts CreateMergeRequestOptions) (*MergeRequest, error) {
+func (gp GitLabProvider) CreateMergeRequest(opts *CreateMergeRequestOptions) (*MergeRequest, error) {
 	mropts := &gitlab.CreateMergeRequestOptions{
 		Title:           opts.Title,
-		Description:     opts.Description,
 		SourceBranch:    opts.SourceBranch,
 		TargetBranch:    opts.TargetBranch,
-		AssigneeID:      opts.AssigneeID,
-		TargetProjectID: opts.TargetProjectID,
+		TargetProjectID: opts.ProjectID,
 	}
 
-	result, _, err := gp.client.MergeRequests.CreateMergeRequest(pid, mropts)
+	result, _, err := gp.client.MergeRequests.CreateMergeRequest(opts.ProjectID, mropts)
 	if err != nil {
 		return nil, err
 	}
@@ -146,17 +144,10 @@ func (gp GitLabProvider) ListMergeRequests(pid int) ([]*MergeRequest, error) {
 
 func mapToMergeRequest(data *gitlab.MergeRequest) *MergeRequest {
 	return &MergeRequest{
-		ID:              data.ID,
-		ProjectID:       data.ProjectID,
-		Title:           data.Title,
-		Description:     data.Description,
-		WorkInProgress:  data.WorkInProgress,
-		State:           data.State,
-		TargetBranch:    data.TargetBranch,
-		SourceBranch:    data.SourceBranch,
-		Upvotes:         data.Upvotes,
-		Downvotes:       data.Downvotes,
-		TargetProjectID: data.TargetProjectID,
+		ID:           data.ID,
+		ProjectID:    data.ProjectID,
+		TargetBranch: data.TargetBranch,
+		SourceBranch: data.SourceBranch,
 	}
 }
 

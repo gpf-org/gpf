@@ -5,10 +5,11 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"regexp"
 	"strconv"
 
 	"github.com/gorilla/mux"
+
+	"github.com/gpf-org/gpf/core"
 	"github.com/gpf-org/gpf/git"
 )
 
@@ -22,22 +23,20 @@ type ServerOptions struct {
 }
 
 type Server struct {
-	options *ServerOptions
-	git     git.GitProvider
-	model   ServerModel
+	options  *ServerOptions
+	provider git.GitProvider
+	store    *core.Store
 }
 
 func NewServer(options *ServerOptions) (*Server, error) {
-	git, err := git.NewProvider(options.BaseURL, options.Token, options.Provider)
+	provider, err := git.NewProvider(options.BaseURL, options.Token, options.Provider)
 	if err != nil {
 		return nil, err
 	}
 
-	model := &MemoryModel{
-		pattern: regexp.MustCompile("^([^/]+)/.*$"),
-	}
+	store := core.NewStore(core.NewIssueNameRegexp("^([0-9]+)/.*$"))
 
-	return &Server{options: options, git: git, model: model}, nil
+	return &Server{options: options, provider: provider, store: store}, nil
 }
 
 func (s *Server) ListenAndServe() error {
@@ -48,6 +47,49 @@ func (s *Server) ListenAndServe() error {
 	log.Printf("Server running on http://%s", addr)
 
 	return http.ListenAndServe(addr, router)
+}
+
+func (s *Server) Reload() error {
+	log.Printf("Reloading the server. It may take awhile.")
+
+	s.store.Reset()
+
+	projs, err := s.provider.ListAllProjects()
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Projects available: %d", len(projs))
+
+	for _, proj := range projs {
+		s.store.AddProject(proj)
+
+		// stop creating hooks till we can handle them
+		// log.Printf("Project %s: reloading webhook", proj.Name)
+		// s.provider.CreateOrUpdateProjectHook(proj.ID, s.options.PublicURL)
+
+		log.Printf("Project %s: reloading branches", proj.Name)
+		branches, err := s.provider.ListAllBranches(proj.ID)
+		if err != nil {
+			return err
+		}
+
+		for _, branch := range branches {
+			s.store.AddBranch(branch)
+		}
+
+		log.Printf("Project %s: reloading merge requests", proj.Name)
+		mrs, err := s.provider.ListMergeRequests(proj.ID)
+		if err != nil {
+			return err
+		}
+
+		for _, mergeRequest := range mrs {
+			s.store.AddMergeRequest(mergeRequest)
+		}
+	}
+
+	return nil
 }
 
 func (s *Server) createRouter() http.Handler {
@@ -71,7 +113,7 @@ func (s *Server) reloadHandler() http.HandlerFunc {
 
 func (s *Server) listHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		data, err := json.Marshal(s.model.List())
+		data, err := json.Marshal(core.ListIssues(s.store))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
