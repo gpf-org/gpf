@@ -13,6 +13,7 @@ var (
 )
 
 var RootCmd = &cobra.Command{
+	Use: "gpf",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if Token == "" {
 			return errors.New("missing required token flag")
