@@ -29,7 +29,7 @@ var ListCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		res, err := http.Get(reloadFlags.publicURL + "/list")
+		res, err := http.Get(reloadFlags.publicURL + "/issues")
 		if err != nil || res.StatusCode != 200 {
 			fmt.Printf("%s\n", err)
 			os.Exit(1)

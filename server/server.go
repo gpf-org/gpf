@@ -97,7 +97,7 @@ func (s *Server) createRouter() http.Handler {
 
 	router.HandleFunc("/reload", s.reloadHandler()).
 		Methods("GET")
-	router.HandleFunc("/list", s.listHandler()).
+	router.HandleFunc("/issues", s.listHandler()).
 		Methods("GET")
 
 	return router
