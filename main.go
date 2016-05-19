@@ -1,11 +1,15 @@
 package main
 
-import "github.com/gpf-org/gpf/cmd"
+import (
+	"fmt"
+	"os"
+
+	"github.com/gpf-org/gpf/cmd"
+)
 
 func main() {
-	cmd.RootCmd.AddCommand(cmd.ServerCmd)
-	cmd.RootCmd.AddCommand(cmd.ReloadCmd)
-	cmd.RootCmd.AddCommand(cmd.ListCmd)
-	cmd.RootCmd.AddCommand(cmd.VersionCmd)
-	cmd.RootCmd.Execute()
+	if err := cmd.RootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

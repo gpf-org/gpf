@@ -26,4 +26,9 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&Provider, "provider", "p", "", "Git provider (e.g. gitlab)")
 	RootCmd.PersistentFlags().StringVarP(&Token, "token", "t", "", "Private token")
 	RootCmd.PersistentFlags().StringVarP(&BaseURL, "baseURL", "b", "https://gitlab.com/api/v3", "Base URL")
+	RootCmd.AddCommand(ServerCmd)
+	RootCmd.AddCommand(ReloadCmd)
+	RootCmd.AddCommand(ListCmd)
+	RootCmd.AddCommand(CodeReviewCmd)
+	RootCmd.AddCommand(VersionCmd)
 }
