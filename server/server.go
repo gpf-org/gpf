@@ -95,8 +95,9 @@ func (s *Server) Reload() error {
 func (s *Server) createRouter() http.Handler {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/reload", s.reloadHandler())
 	router.HandleFunc("/list", s.listHandler())
+	router.HandleFunc("/reload", s.reloadHandler()).
+		Methods("GET")
 
 	return router
 }
