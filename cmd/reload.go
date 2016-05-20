@@ -1,40 +1,27 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
+	"log"
 	"net/http"
-	"os"
 
 	"github.com/spf13/cobra"
 )
 
-type ReloadFlags struct {
-	publicURL string
-}
-
-var reloadFlags = &ReloadFlags{}
-
 var ReloadCmd = &cobra.Command{
-	Use:   "reload",
-	Short: "reconfigure all projects configuration",
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if reloadFlags.publicURL == "" {
-			return errors.New("missing required publicURL flag")
-		}
-		return nil
-	},
+	Use:               "reload",
+	Short:             "Force server to reload configuration",
+	PersistentPreRunE: clientPersistentPreRunE,
 	Run: func(cmd *cobra.Command, args []string) {
-		resp, err := http.Get(reloadFlags.publicURL + "/reload")
+		resp, err := http.Get(clientFlags.serviceURL + "/reload")
 		if err != nil || resp.StatusCode != 200 {
-			fmt.Printf("%s\n", err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
-		fmt.Printf("Finished reloading")
+		fmt.Printf("Server configuration reloaded with success")
 	},
 }
 
 func init() {
-	ReloadCmd.PersistentFlags().StringVarP(&reloadFlags.publicURL, "publicURL", "", "http://localhost:5544", "Public URL")
+	addClientFlags(ReloadCmd)
 }
