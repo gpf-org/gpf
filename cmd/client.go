@@ -11,7 +11,7 @@ var clientFlags = struct {
 }{}
 
 func addClientFlags(command *cobra.Command) {
-	command.PersistentFlags().StringVarP(&clientFlags.serviceURL, "serviceURL", "", "", "Service URL")
+	command.PersistentFlags().StringVarP(&clientFlags.serviceURL, "serviceURL", "s", "", "Service URL")
 }
 
 func clientPersistentPreRunE(cmd *cobra.Command, args []string) error {
