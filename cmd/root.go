@@ -6,10 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
-var RootCmd = &cobra.Command{
-	Use: "gpf",
-}
+var RootCmd = &cobra.Command{Use: "gpf"}
 
 func init() {
 	RootCmd.AddCommand(ServerCmd)
