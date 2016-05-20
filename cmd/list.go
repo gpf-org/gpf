@@ -12,23 +12,12 @@ import (
 	"github.com/gpf-org/gpf/core"
 )
 
-type ListFlags struct {
-	publicURL string
-}
-
-var listFlags = &ListFlags{}
-
 var ListCmd = &cobra.Command{
-	Use:   "list",
-	Short: "list features",
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if listFlags.publicURL == "" {
-			return errors.New("missing required publicURL flag")
-		}
-		return nil
-	},
-		res, err := http.Get(reloadFlags.publicURL + "/issues")
+	Use:               "list",
+	Short:             "List issues",
+	PersistentPreRunE: clientPersistentPreRunE,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		res, err := http.Get(clientFlags.serviceURL + "/issues")
 		if err != nil || res.StatusCode != 200 {
 			return err
 		}
@@ -62,5 +51,5 @@ var ListCmd = &cobra.Command{
 }
 
 func init() {
-	ListCmd.PersistentFlags().StringVarP(&listFlags.publicURL, "publicURL", "", "http://localhost:5544", "Public URL")
+	addClientFlags(ListCmd)
 }
