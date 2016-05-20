@@ -22,9 +22,9 @@ type IssueBranch struct {
 	BranchName  string `json:"branch_name"`
 }
 
-type AffectedBranch struct {
-	Branch *git.Branch
-	Error  error
+type AffectedIssueBranch struct {
+	IssueBranch *IssueBranch `json:"issue_branch"`
+	Error       error        `json:"error"`
 }
 
 func ListIssues(store *Store) []*Issue {
@@ -89,7 +89,7 @@ func SupportCodeReviewRequest(store *Store, issue string) (bool, []*git.Branch, 
 	return support, result, nil
 }
 
-func CodeReviewRequest(provider git.GitProvider, store *Store, issue string) ([]*AffectedBranch, error) {
+func CodeReviewRequest(provider git.GitProvider, store *Store, issue string) ([]*AffectedIssueBranch, error) {
 	support, branches, err := SupportCodeReviewRequest(store, issue)
 
 	if err != nil {
@@ -100,7 +100,7 @@ func CodeReviewRequest(provider git.GitProvider, store *Store, issue string) ([]
 		return nil, ErrCodeReviewAlreadyRequested
 	}
 
-	result := make([]*AffectedBranch, 0, len(branches))
+	result := make([]*AffectedIssueBranch, 0, len(branches))
 
 	for _, branch := range branches {
 		options := &git.CreateMergeRequestOptions{
@@ -116,12 +116,17 @@ func CodeReviewRequest(provider git.GitProvider, store *Store, issue string) ([]
 			store.AddMergeRequest(mergeRequest)
 		}
 
-		affectedBranch := &AffectedBranch{
-			Branch: branch,
-			Error:  err,
+		project, _ := store.GetProject(branch.ProjectID)
+
+		affectedIssueBranch := &AffectedIssueBranch{
+			IssueBranch: &IssueBranch{
+				ProjectName: project.Name,
+				BranchName:  branch.Name,
+			},
+			Error: err,
 		}
 
-		result = append(result, affectedBranch)
+		result = append(result, affectedIssueBranch)
 	}
 
 	return result, nil

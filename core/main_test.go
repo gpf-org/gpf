@@ -132,11 +132,19 @@ func TestCodeReviewRequest(t *testing.T) {
 
 	store := NewStore(NewIssueNameRegexp("^issue-([^/]+)/.*$"))
 
+	store.AddProject(&git.Project{
+		ID:   1,
+		Name: "my-project",
+	})
 	store.AddBranch(&git.Branch{
 		Name:      "issue-3/fix-something",
 		ProjectID: 1,
 	})
 
+	store.AddProject(&git.Project{
+		ID:   2,
+		Name: "my-second-project",
+	})
 	store.AddBranch(&git.Branch{
 		Name:      "issue-3/do-something-else",
 		ProjectID: 2,
@@ -148,27 +156,27 @@ func TestCodeReviewRequest(t *testing.T) {
 		TargetBranch: "develop",
 	})
 
-	affectedBranches, err := CodeReviewRequest(provider, store, "3")
+	affectedIssueBranches, err := CodeReviewRequest(provider, store, "3")
 	if err != nil {
 		t.Fatalf("Unexpected error [%v]", err)
 	}
 
-	if len(affectedBranches) != 1 {
-		t.Fatalf("Expected affected branches [%d], got [%d]", 1, len(affectedBranches))
+	if len(affectedIssueBranches) != 1 {
+		t.Fatalf("Expected affected issue branches [%d], got [%d]", 1, len(affectedIssueBranches))
 	}
 
-	expected := []*AffectedBranch{
+	expected := []*AffectedIssueBranch{
 		{
-			Branch: &git.Branch{
-				Name:      "issue-3/fix-something",
-				ProjectID: 1,
+			IssueBranch: &IssueBranch{
+				ProjectName: "my-project",
+				BranchName:  "issue-3/fix-something",
 			},
 			Error: nil,
 		},
 	}
 
-	if !reflect.DeepEqual(affectedBranches, expected) {
-		t.Errorf("Expected [%v] to be equal [%v]", affectedBranches, expected)
+	if !reflect.DeepEqual(affectedIssueBranches, expected) {
+		t.Errorf("Expected [%v] to be equal [%v]", affectedIssueBranches, expected)
 	}
 }
 

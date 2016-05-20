@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -103,6 +104,8 @@ func (s *Server) createRouter() http.Handler {
 		Methods("GET")
 	router.HandleFunc("/issues", s.listHandler).
 		Methods("GET")
+	router.HandleFunc("/issues/{name}/command/{code}", s.commandHandler).
+		Methods("POST")
 
 	return router
 }
@@ -117,6 +120,38 @@ func (s *Server) reloadHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) listHandler(w http.ResponseWriter, r *http.Request) {
 	data, err := json.Marshal(s.ListIssues())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
+
+func (s *Server) commandHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	code, err := strconv.Atoi(vars["code"])
+	if err != nil {
+		http.Error(w, "Invalid command code", http.StatusBadRequest)
+		return
+	}
+
+	var issueBranches []*core.AffectedIssueBranch
+
+	switch code {
+	case core.CommandCodeReviewRequest:
+		issueBranches, err = core.CodeReviewRequest(s.provider, s.store, vars["name"])
+	}
+
+	if err != nil {
+		msg := fmt.Sprintf("Failed to execute command [%s]: %v", core.CommandText(code), err)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(issueBranches)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
