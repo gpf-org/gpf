@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -146,8 +145,7 @@ func (s *Server) commandHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		msg := fmt.Sprintf("Failed to execute command [%s]: %v", core.CommandText(code), err)
-		http.Error(w, msg, http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
