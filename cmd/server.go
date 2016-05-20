@@ -42,7 +42,7 @@ func init() {
 	ServerCmd.PersistentFlags().StringVarP(&options.Provider, "provider", "p", "", "Git provider (e.g. gitlab, github)")
 	ServerCmd.PersistentFlags().StringVarP(&options.Token, "token", "t", "", "Private token")
 	ServerCmd.PersistentFlags().StringVarP(&options.BaseURL, "baseURL", "", "https://gitlab.com/api/v3", "Base URL")
-	ServerCmd.PersistentFlags().StringVarP(&options.PublicURL, "publicURL", "", "http://localhost:5544", "Public URL")
+	ServerCmd.PersistentFlags().StringVarP(&options.PublicURL, "publicURL", "", "", "Public URL")
 	ServerCmd.PersistentFlags().StringVarP(&options.Bind, "bind", "", "127.0.0.1", "Interface to which the server will bind")
 	ServerCmd.PersistentFlags().IntVarP(&options.Port, "port", "", 5544, "Port on which the server will listen")
 }
