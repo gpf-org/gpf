@@ -30,5 +30,4 @@ func init() {
 	RootCmd.AddCommand(ReloadCmd)
 	RootCmd.AddCommand(ListCmd)
 	RootCmd.AddCommand(CodeReviewCmd)
-	RootCmd.AddCommand(VersionCmd)
 }
