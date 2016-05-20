@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 
 	"github.com/spf13/cobra"
 
@@ -28,23 +27,20 @@ var ListCmd = &cobra.Command{
 		}
 		return nil
 	},
-	Run: func(cmd *cobra.Command, args []string) {
 		res, err := http.Get(reloadFlags.publicURL + "/issues")
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if err != nil || res.StatusCode != 200 {
-			fmt.Printf("%s\n", err)
-			os.Exit(1)
+			return err
 		}
 
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			fmt.Printf("unable to retrieve list of issues")
-			os.Exit(1)
+			return errors.New("Unable to retrieve list of issues")
 		}
 
 		issues := make([]core.Issue, 0)
 		if err := json.Unmarshal(body, &issues); err != nil {
-			fmt.Printf("unable to decode list of issues")
-			os.Exit(1)
+			return errors.New("Unable to decode list of issues")
 		}
 
 		for _, issue := range issues {
@@ -60,6 +56,8 @@ var ListCmd = &cobra.Command{
 				fmt.Printf("\t\tcommand: %s\n", core.CommandText(command))
 			}
 		}
+
+		return nil
 	},
 }
 
