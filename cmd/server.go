@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"errors"
-	"log"
+	"fmt"
 
 	"github.com/gpf-org/gpf/server"
 	"github.com/spf13/cobra"
@@ -22,19 +22,21 @@ var ServerCmd = &cobra.Command{
 		}
 		return nil
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		s, err := server.NewServer(options)
 		if err != nil {
-			log.Fatal("Failed to create server instance: ", err)
+			return fmt.Errorf("Failed to create server instance: %v", err)
 		}
 
 		if err := s.Reload(); err != nil {
-			log.Fatal("Failed to reload server data: ", err)
+			return fmt.Errorf("Failed to reload server data: %v", err)
 		}
 
 		if err := s.ListenAndServe(); err != nil {
-			log.Fatal("Failed to start listening: ", err)
+			return fmt.Errorf("Failed to start listening: %v", err)
 		}
+
+		return nil
 	},
 }
 
