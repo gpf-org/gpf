@@ -30,43 +30,50 @@ func (gp GitLabProvider) ListAllBranches(pid int) ([]*Branch, error) {
 
 // CreateOrUpdateProjectHook creates a hook to a specified project or update it if already exists.
 func (gp GitLabProvider) CreateOrUpdateProjectHook(pid int, hookURL string) (*ProjectHook, error) {
-	// TODO: handle paging search
-	optsList := &gitlab.ListProjectHooksOptions{}
-	result, _, err := gp.client.Projects.ListProjectHooks(pid, optsList)
-	if err != nil {
-		return nil, err
+	var result *gitlab.ProjectHook
+
+	listOptions := &gitlab.ListProjectHooksOptions{
+		ListOptions: gitlab.ListOptions{
+			PerPage: 100,
+		},
 	}
 
-	hooks := mapToProjectHooks(result)
+	for i := 1; ; i++ {
+		listOptions.Page = i
 
-	for i := range hooks {
-		if hooks[i].URL == hookURL {
-			// ensure it has the right configurations
-			optsEdit := &gitlab.EditProjectHookOptions{
-				URL:                 hookURL,
-				PushEvents:          true,
-				IssuesEvents:        true,
-				MergeRequestsEvents: true,
-				TagPushEvents:       true,
+		hooks, _, err := gp.client.Projects.ListProjectHooks(pid, listOptions)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(hooks) == 0 {
+			break
+		}
+
+		for _, hook := range hooks {
+			if hook.URL != hookURL {
+				continue
 			}
 
-			hook, _, err := gp.client.Projects.EditProjectHook(pid, hooks[i].ID, optsEdit)
-
-			return mapToProjectHook(hook), err
+			result = hook
 		}
 	}
 
-	optsAdd := &gitlab.AddProjectHookOptions{
-		URL:                 hookURL,
-		PushEvents:          true,
-		IssuesEvents:        true,
-		MergeRequestsEvents: true,
-		TagPushEvents:       true,
+	if result == nil {
+		addOptions := &gitlab.AddProjectHookOptions{
+			URL:                 hookURL,
+			PushEvents:          true,
+			MergeRequestsEvents: true,
+		}
+
+		var err error
+		result, _, err = gp.client.Projects.AddProjectHook(pid, addOptions)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	hook, _, err := gp.client.Projects.AddProjectHook(pid, optsAdd)
-
-	return mapToProjectHook(hook), err
+	return mapToProjectHook(result), nil
 }
 
 func mapToProjectHook(data *gitlab.ProjectHook) *ProjectHook {

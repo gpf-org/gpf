@@ -65,8 +65,8 @@ func (s *Server) Reload() error {
 		s.store.AddProject(proj)
 
 		// stop creating hooks till we can handle them
-		// log.Printf("Project %s: reloading webhook", proj.Name)
-		// s.provider.CreateOrUpdateProjectHook(proj.ID, s.options.PublicURL)
+		log.Printf("Project %s: setting up webhook", proj.Name)
+		s.provider.CreateOrUpdateProjectHook(proj.ID, s.options.PublicURL)
 
 		log.Printf("Project %s: reloading branches", proj.Name)
 		branches, err := s.provider.ListAllBranches(proj.ID)
