@@ -52,6 +52,7 @@ func (gp GitLabProvider) CreateOrUpdateProjectHook(pid int, hookURL string) (*Pr
 
 		for _, hook := range hooks {
 			if hook.URL != hookURL {
+				gp.client.Projects.DeleteProjectHook(pid, hook.ID)
 				continue
 			}
 
